@@ -52,22 +52,76 @@ const moviesController = {
     },
     //Aqui dispongo las rutas para trabajar con el CRUD
     add: function (req, res) {
-        
+        Genres.findAll()
+        .then(allGenres => {
+            res.render('moviesAdd', {
+                allGenres
+            })
+        })
+        .catch(error => console.log(error))
     },
     create: function (req,res) {
-
+        Movies.create({
+            title: req.body.title,
+            rating: req.body.rating,
+            awards: req.body.awards,
+            release_date: req.body.release_date,
+            length: req.body.length,
+            genre_id: req.body.genre_id
+        })
+        .then(() => {
+            res.redirect('/movies')
+        })
+        .catch(error => console.log(error))
     },
     edit: function(req,res) {
-
+        const genresPromise = Genres.findAll()
+        const moviePromise = Movies.findByPk(req.params.id)
+        Promise.all([genresPromise, moviePromise])
+        .then(([allGenres, Movie]) => {
+            res.render('moviesEdit', {
+                allGenres,
+                Movie
+            })
+        })
     },
     update: function (req,res) {
-
+        Movies.update({
+            title: req.body.title,
+            rating: req.body.rating,
+            awards: req.body.awards,
+            release_date: req.body.release_date,
+            length: req.body.length,
+            genre_id: req.body.genre_id
+        },{
+            where: {
+                id: +req.params.id
+            }
+        })
+        .then(() => {
+            res.redirect('/movies')
+        })
+        .catch(error => console.log(error))
     },
     delete: function (req,res) {
-
+        Movies.findByPk(+req.params.id)
+        .then(Movie => {
+            res.render('moviesDelete', {
+                Movie
+            })
+        })
+        .catch(error => console.log(error))
     },
     destroy: function (req,res) {
-
+        Movies.destroy({
+            where: {
+                id: +req.params.id
+            }
+        })
+        .then(() => {
+            res.redirect('/movies')
+        })
+        .catch(error => console.log(error))
     }
 }
 
